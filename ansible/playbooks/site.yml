@@ -1,0 +1,8 @@
+---
+- name: Configure network devices and collect system info
+  hosts: routers
+  become: true
+  gather_facts: true
+  roles:
+    - device_config
+    - system_info

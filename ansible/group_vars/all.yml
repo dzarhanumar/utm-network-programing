@@ -1,0 +1,20 @@
+---
+# NOTE: On AWS Ubuntu 22.04 EC2 instances the primary network interface
+# is usually "ens5", NOT "eth0" like in the local Docker version.
+# SSH into router1 and run `ip a` first to confirm before running the
+# playbook - update device_interface below if it's different.
+device_ip: "192.168.100.10/24"
+device_interface: "ens5"
+interface_description: "Link to Core Switch - Configured by Ansible"
+
+new_user: "netadmin"
+new_user_password: "P@ssw0rd123"
+
+banner_text: |
+  ***********************************************
+  * WARNING: Authorized Access Only             *
+  * SECR3253 Network Automation Project          *
+  ***********************************************
+
+static_route_dest: "10.10.10.0/24"
+static_route_gw: "192.168.100.1"
