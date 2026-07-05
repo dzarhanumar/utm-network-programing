@@ -1,0 +1,79 @@
+---
+# 1. Configure IP address
+- name: Assign IP address to interface
+  ansible.builtin.command: >
+    ip addr add {{ device_ip }} dev {{ device_interface }}
+  register: ip_result
+  changed_when: "'File exists' not in ip_result.stderr"
+  failed_when: "ip_result.rc != 0 and 'File exists' not in ip_result.stderr"
+
+# 2. Create user account
+- name: Create new user account
+  ansible.builtin.user:
+    name: "{{ new_user }}"
+    password: "{{ new_user_password | password_hash('sha512') }}"
+    shell: /bin/bash
+    state: present
+
+# 3. Configure banner message
+- name: Configure MOTD banner (post-login)
+  ansible.builtin.copy:
+    content: "{{ banner_text }}"
+    dest: /etc/motd
+
+- name: Configure pre-login SSH banner
+  ansible.builtin.copy:
+    content: "{{ banner_text }}"
+    dest: /etc/issue.net
+
+- name: Point sshd to the banner file
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?Banner'
+    line: 'Banner /etc/issue.net'
+  notify: restart ssh
+
+# 4. Configure interface description (Linux equivalent = interface alias)
+- name: Set interface description/alias
+  ansible.builtin.command: >
+    ip link set dev {{ device_interface }} alias "{{ interface_description }}"
+
+# 5. Configure static route
+- name: Add static route
+  ansible.builtin.command: >
+    ip route add {{ static_route_dest }} via {{ static_route_gw }}
+  register: route_result
+  changed_when: "'File exists' not in route_result.stderr"
+  failed_when: "route_result.rc != 0 and 'File exists' not in route_result.stderr"
+
+# 6. Retrieve device information
+- name: Gather device facts
+  ansible.builtin.setup:
+  register: device_facts
+
+- name: Display retrieved device info
+  ansible.builtin.debug:
+    msg:
+      - "Hostname: {{ ansible_hostname }}"
+      - "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+      - "IP Addresses: {{ ansible_all_ipv4_addresses }}"
+      - "Interfaces: {{ ansible_interfaces }}"
+
+- name: Save device info report to file
+  ansible.builtin.copy:
+    content: |
+      ================ DEVICE INFO REPORT ================
+      Device: {{ inventory_hostname }}
+      Hostname: {{ ansible_hostname }}
+      OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+      Kernel: {{ ansible_kernel }}
+      IP Addresses: {{ ansible_all_ipv4_addresses }}
+      Interfaces: {{ ansible_interfaces }}
+      ======================================================
+    dest: "/tmp/device_info_{{ inventory_hostname }}.txt"
+
+- name: Fetch device info report to control node
+  ansible.builtin.fetch:
+    src: "/tmp/device_info_{{ inventory_hostname }}.txt"
+    dest: "./reports/"
+    flat: true
