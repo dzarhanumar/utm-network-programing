@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  ansible-control:
+    build: ./docker/control
+    container_name: ansible-control
+    volumes:
+      - ./ansible:/ansible
+      - ./reports:/ansible/reports
+    networks:
+      - automation-net
+    tty: true
+    depends_on:
+      - router1
+      - router2
+
+  router1:
+    build: ./docker/device
+    container_name: router1
+    hostname: router1
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - automation-net
+
+  router2:
+    build: ./docker/device
+    container_name: router2
+    hostname: router2
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - automation-net
+
+networks:
+  automation-net:
+    driver: bridge

@@ -1,0 +1,19 @@
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/*.pem
+
+# SSH keys (any location)
+*.pem
+*.key
+
+# Ansible
+*.retry
+reports/*.txt
+
+# OS/editor junk
+.DS_Store
+.vscode/
+*.swp
