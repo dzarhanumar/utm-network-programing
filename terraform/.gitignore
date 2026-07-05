@@ -1,0 +1,8 @@
+# Never commit these - they contain secrets / machine-specific state
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+*.pem
+crash.log
+terraform.tfvars
