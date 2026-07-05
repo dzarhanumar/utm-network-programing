@@ -1,117 +1,89 @@
 # SECR3253 Network Automation Group Project
 
-## Overview
-This project automates network device configuration and Linux system
-information gathering using **Docker + Ansible**.
+Group project for Network Programming. Automates network device config
+and collects Linux system info using Docker, Ansible, and Terraform
+(AWS).
 
-Since we don't have physical routers, we simulate 2 network devices
-(`router1`, `router2`) as Linux containers reachable over SSH. Ansible
-connects to them from a control-node container and performs all
-required configuration and reporting tasks.
+## What we built
+We don't have real routers to play with, so we simulate 2 network
+devices as Linux hosts reachable over SSH. Ansible connects to them
+and handles:
 
-## Architecture
-```
-                 +-------------------+
-                 |  ansible-control  |
-                 |  (runs playbooks) |
-                 +---------+---------+
-                           | SSH
-             +-------------+-------------+
-             |                           |
-      +------v------+           +--------v-----+
-      |   router1    |           |   router2    |
-      | (sim device) |           | (sim device) |
-      +--------------+           +--------------+
-```
-
-## Tasks Automated
-**Device configuration (per device):**
-1. Configure IP address on interface
+**Device configuration (per device)**
+1. Set IP address on the interface
 2. Create a user account
-3. Configure login banner message
+3. Set a login banner
 4. Set interface description (alias)
 5. Add a static route
-6. Retrieve device information (facts)
+6. Pull back device info (facts)
 
-**System information collection:**
-- Hostname
-- Current date and time
-- CPU information
-- Memory usage
-- Disk usage
-- Logged-in users
-- Top 5 processes by CPU usage
+**System info collection**
+- hostname
+- current date/time
+- CPU info
+- memory usage
+- disk usage
+- logged-in users
+- top 5 processes by CPU usage
 
-Reports are saved automatically to the `reports/` folder on the host
-machine after each run.
+There's 2 ways to run this:
+1. **Docker** — everything local in containers, quick to test
+2. **Terraform + AWS** — real VPC (public + private subnet) deployed
+   on AWS, this is the version we actually used for testing/demo
 
-## How to Run
-1. Install Docker Desktop.
-2. Clone this repo:
-   ```
-   git clone <your-repo-url>
-   cd network-automation-project
-   ```
-3. Build and start the containers:
-   ```
-   docker compose up -d --build
-   ```
-4. Enter the Ansible control container:
-   ```
-   docker exec -it ansible-control bash
-   ```
-5. Test connectivity:
-   ```
-   cd /ansible
-   ansible routers -m ping
-   ```
-6. Run the full automation:
-   ```
-   ansible-playbook playbooks/site.yml
-   ```
-7. Check results in the `reports/` folder (on your host machine, not
-   inside the container) — you'll see one device-info and one
-   system-info text file per device.
+## Option 1: Docker (local)
+```bash
+docker compose up -d --build
+docker exec -it ansible-control bash
+cd /ansible
+ansible routers -m ping
+ansible-playbook playbooks/site.yml
+```
+Output goes to `reports/`.
 
-## Project Structure
+## Option 2: Terraform + AWS (what we actually deployed)
+Full steps in `TERRAFORM_SETUP.md`. Quick version:
+```bash
+cd terraform
+terraform init
+terraform apply
+```
+Then SSH into the control node, install Ansible, copy the `ansible/`
+folder over, and run the playbook against router1/router2 in the
+private subnet. We hit a few bugs getting this working — all written
+up in `PROJECT_LOG.md` with the actual errors and how we fixed them.
+
+## Project structure
 ```
 network-automation-project/
 ├── docker-compose.yml
-├── docker/
-│   ├── control/Dockerfile      # Ansible control node image
-│   └── device/Dockerfile       # Simulated network device image
+├── docker/                     # Docker version (control + device images)
+├── terraform/                  # Terraform - VPC, subnets, EC2 (main deployment)
+├── aws/                        # older AWS CLI scripts, not used in final version
 ├── ansible/
 │   ├── ansible.cfg
-│   ├── inventory/hosts.ini
-│   ├── group_vars/all.yml
+│   ├── inventory/               # hosts.ini (Docker) + hosts-aws.ini (AWS)
 │   ├── playbooks/site.yml
 │   └── roles/
-│       ├── device_config/      # Tasks 1-6
-│       └── system_info/        # System info collection
-└── reports/                    # Auto-generated output reports
+│       ├── device_config/       # tasks 1-6
+│       └── system_info/         # system info collection
+├── evidence/                    # output from our actual AWS run
+├── PROJECT_LOG.md               # bugs we hit + fixes
+├── TERRAFORM_SETUP.md
+├── AWS_SETUP.md                 # old CLI version, kept for reference
+└── REFLECTION_TEMPLATE.md
 ```
 
-## Team Task Division (suggested — edit to match your actual group)
-| Member | Responsibility | Files owned |
-|---|---|---|
-| Member A | Docker environment setup | `docker-compose.yml`, `docker/` |
-| Member B | Device configuration automation | `ansible/roles/device_config/` |
-| Member C | System info automation | `ansible/roles/system_info/` |
-| Member D | Inventory/vars, testing, README, integration | `ansible/inventory/`, `ansible/group_vars/`, `README.md` |
+## Team
+| Name | Part |
+|---|---|
+| _(fill in)_ | Docker setup |
+| _(fill in)_ | device_config role |
+| _(fill in)_ | system_info role |
+| _(fill in)_ | Terraform + AWS deployment |
 
-Each member should commit their own part directly, so the Git history
-reflects real, individual contribution (this is 30% of your marks).
-
-## Git Workflow (do this as a group)
-```bash
-# each member, on their own machine:
-git clone <repo-url>
-git checkout -b feature/<your-name>-<your-part>
-# ... make your changes ...
-git add .
-git commit -m "Add device_config role: IP, user, banner tasks"
-git push origin feature/<your-name>-<your-part>
-# then open a Pull Request on GitHub and merge into main
-```
-Avoid one person pushing everything in a single commit — that will
-look like no real collaboration happened.
+## Other docs in this repo
+- `TERRAFORM_SETUP.md` — how we deployed on AWS (main version)
+- `AWS_SETUP.md` — earlier AWS CLI version, single public subnet only, kept as backup
+- `PROJECT_LOG.md` — errors we ran into and how we fixed them
+- `REFLECTION_TEMPLATE.md` — template each member fills in individually
