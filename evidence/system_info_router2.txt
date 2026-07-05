@@ -1,0 +1,40 @@
+================= SYSTEM INFO REPORT =================
+Host: router2
+Hostname: ip-10-0-2-142
+Date/Time: Sun Jul  5 05:35:52 UTC 2026
+
+--- CPU Info ---
+CPU(s):                                  2
+On-line CPU(s) list:                     0,1
+Model name:                              Intel(R) Xeon(R) Platinum 8259CL CPU @ 2.50GHz
+Thread(s) per core:                      2
+Core(s) per socket:                      1
+NUMA node0 CPU(s):                       0,1
+
+--- Memory Usage ---
+               total        used        free      shared  buff/cache   available
+Mem:           913Mi       205Mi       175Mi       2.0Mi       533Mi       548Mi
+Swap:             0B          0B          0B
+
+--- Disk Usage ---
+Filesystem       Size  Used Avail Use% Mounted on
+/dev/root        7.6G  1.9G  5.8G  25% /
+tmpfs            457M     0  457M   0% /dev/shm
+tmpfs            183M  860K  182M   1% /run
+tmpfs            5.0M     0  5.0M   0% /run/lock
+efivarfs         128K  3.1K  120K   3% /sys/firmware/efi/efivars
+/dev/nvme0n1p15  105M  6.1M   99M   6% /boot/efi
+tmpfs             92M  4.0K   92M   1% /run/user/1000
+
+--- Logged-in Users ---
+ubuntu   pts/0        2026-07-05 05:35 (10.0.1.131)
+ubuntu   pts/1        2026-07-05 05:35 (10.0.1.131)
+
+--- Top 5 Processes by CPU ---
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+ubuntu      2341  1.8  0.9  17868  8972 ?        S    05:35   0:00 sshd: ubuntu@pts/0
+ubuntu      2279  0.4  1.0  16972  9832 ?        Ss   05:35   0:00 /lib/systemd/systemd --user
+root        2276  0.2  1.1  17060 10936 ?        Ss   05:35   0:00 sshd: ubuntu [priv]
+root           1  0.1  1.3 101968 12960 ?        Ss   05:10   0:01 /sbin/init
+root         418  0.1  4.5 1474272 42548 ?       Ssl  05:10   0:01 /usr/lib/snapd/snapd
+=======================================================

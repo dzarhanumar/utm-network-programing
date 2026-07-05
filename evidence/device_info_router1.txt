@@ -1,0 +1,8 @@
+================ DEVICE INFO REPORT ================
+Device: router1
+Hostname: ip-10-0-2-188
+OS: Ubuntu 22.04
+Kernel: 6.8.0-1060-aws
+IP Addresses: ['10.0.2.188', '192.168.100.10']
+Interfaces: ['ens5', 'lo']
+======================================================
