@@ -1,0 +1,71 @@
+---
+- name: Get hostname
+  ansible.builtin.command: hostname
+  register: r_hostname
+  changed_when: false
+
+- name: Get current date and time
+  ansible.builtin.command: date
+  register: r_date
+  changed_when: false
+
+- name: Get CPU information
+  ansible.builtin.shell: lscpu | grep -E 'Model name|CPU\(s\)|Thread|Core' || true
+  register: r_cpu
+  changed_when: false
+
+- name: Get memory usage
+  ansible.builtin.command: free -h
+  register: r_mem
+  changed_when: false
+
+- name: Get disk usage
+  ansible.builtin.command: df -h
+  register: r_disk
+  changed_when: false
+
+- name: Get logged-in users
+  ansible.builtin.command: who
+  register: r_users
+  changed_when: false
+  failed_when: false
+
+- name: Get top 5 processes by CPU usage
+  ansible.builtin.shell: ps aux --sort=-%cpu | head -6
+  register: r_top
+  changed_when: false
+
+- name: Build system info report
+  ansible.builtin.copy:
+    content: |
+      ================= SYSTEM INFO REPORT =================
+      Host: {{ inventory_hostname }}
+      Hostname: {{ r_hostname.stdout }}
+      Date/Time: {{ r_date.stdout }}
+
+      --- CPU Info ---
+      {{ r_cpu.stdout }}
+
+      --- Memory Usage ---
+      {{ r_mem.stdout }}
+
+      --- Disk Usage ---
+      {{ r_disk.stdout }}
+
+      --- Logged-in Users ---
+      {{ r_users.stdout | default('No users currently logged in') }}
+
+      --- Top 5 Processes by CPU ---
+      {{ r_top.stdout }}
+      =======================================================
+    dest: "/tmp/system_info_{{ inventory_hostname }}.txt"
+
+- name: Display system info report
+  ansible.builtin.debug:
+    msg: "{{ lookup('file', '/tmp/system_info_' + inventory_hostname + '.txt') }}"
+
+- name: Fetch system info report to control node
+  ansible.builtin.fetch:
+    src: "/tmp/system_info_{{ inventory_hostname }}.txt"
+    dest: "./reports/"
+    flat: true
