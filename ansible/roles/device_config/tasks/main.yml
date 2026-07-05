@@ -4,8 +4,8 @@
   ansible.builtin.command: >
     ip addr add {{ device_ip }} dev {{ device_interface }}
   register: ip_result
-  changed_when: "'File exists' not in ip_result.stderr"
-  failed_when: "ip_result.rc != 0 and 'File exists' not in ip_result.stderr"
+  changed_when: "'File exists' not in ip_result.stderr and 'Address already assigned' not in ip_result.stderr"
+  failed_when: "ip_result.rc != 0 and 'File exists' not in ip_result.stderr and 'Address already assigned' not in ip_result.stderr"
 
 # 2. Create user account
 - name: Create new user account
@@ -43,7 +43,7 @@
   ansible.builtin.command: >
     ip route add {{ static_route_dest }} via {{ static_route_gw }}
   register: route_result
-  changed_when: "'File exists' not in route_result.stderr"
+  changed_when: "'File exists' not in route_result.stderr and 'File exists' not in route_result.stdout"
   failed_when: "route_result.rc != 0 and 'File exists' not in route_result.stderr"
 
 # 6. Retrieve device information
