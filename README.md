@@ -77,10 +77,10 @@ network-automation-project/
 ## Team
 | Name | Part |
 |---|---|
-| _(fill in)_ | Docker setup |
-| _(fill in)_ | device_config role |
-| _(fill in)_ | system_info role |
-| _(fill in)_ | Terraform + AWS deployment |
+| NORMAN SHANE NYIGOR SX170149CSRS04| Docker setup |
+| MOHAMMAD MUSLIM BIN CHE ISMAIL SX190866CSRS04| device_config role |
+| MUHAMMAD AZMI BIN HAMIDI SX231768ECRHF04| system_info role |
+| MUHAMAD DZARHAN BIN AZMY SX240663ECRHS04| Terraform + AWS deployment |
 
 ## Other docs in this repo
 - `TERRAFORM_SETUP.md` — how we deployed on AWS (main version)
